@@ -8,8 +8,14 @@
     <div>
       <label>创建的心愿</label>
       <ul>
-        <li v-for="(item, key) in wishesTodo" :key="key">{{item.title}}</li>
+        <li v-for="(item, key) in wishesTodo" :key="key">{{ item.title }}</li>
       </ul>
+    </div>
+    <div v-if="wishDoing.title">
+      当前正在进行的心愿: {{wishDoing.title}}
+    </div>
+    <div v-else>
+      <button>随机选一个</button>
     </div>
   </div>
 </template>
@@ -21,24 +27,27 @@ export default {
   components: {},
   data() {
     return {
-      wish: "",
-      wishesTodo: ""
+      newWish: "",
+      wishDoing: {},
+      wishesTodo: [],
+      wishesDone: [],
+      wisheeFail: []
     };
   },
   methods: {
     createWish() {
-      axios.post("/wish", { title: this.wish }).then(() => {
+      axios.post("/wish", { title: this.newWish }).then(() => {
         console.log("成功");
       });
     },
-    queryWishes () {
-      axios.get('/wishes/todo').then(({data}) => {
-        this.wishesTodo = data
-      })
+    queryWishes() {
+      axios.get("/wishes/todo").then(({ data }) => {
+        this.wishesTodo = data;
+      });
     }
   },
-  mounted () {
-    this.queryWishes()
+  mounted() {
+    this.queryWishes();
   }
 };
 </script>

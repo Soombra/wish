@@ -14,6 +14,7 @@ const app = express()
 app.use(bodyParser())
 apis(app)
 
+app.use(express.static('dist'))
 app.listen(3003, () => {
   console.log('服务器运行在3003')
 })
