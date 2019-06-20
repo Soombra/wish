@@ -2,7 +2,7 @@
   <div id="app">
     <div>
       <label>创建心愿</label>
-      <input type="text" v-model="wish" />
+      <input type="text" v-model="newWish" />
       <button @click="createWish">提交</button>
     </div>
     <div>
@@ -12,10 +12,24 @@
       </ul>
     </div>
     <div v-if="wishDoing.title">
-      当前正在进行的心愿: {{wishDoing.title}}
+      当前正在进行的心愿: {{ wishDoing.title }}
+      <button @click="handleDone">完成</button>
+      <button @click="handleFail">废弃</button>
     </div>
     <div v-else>
-      <button>随机选一个</button>
+      <button @click="handleChoose">随机选一个</button>
+    </div>
+    <div>
+      <label>完成的心愿</label>
+      <ul>
+        <li v-for="(item, key) in wishesDone" :key="key">{{ item.title }}</li>
+      </ul>
+    </div>
+    <div>
+      <label>废弃的心愿</label>
+      <ul>
+        <li v-for="(item, key) in wishesFail" :key="key">{{ item.title }}</li>
+      </ul>
     </div>
   </div>
 </template>
@@ -31,23 +45,61 @@ export default {
       wishDoing: {},
       wishesTodo: [],
       wishesDone: [],
-      wisheeFail: []
+      wishesFail: []
     };
   },
   methods: {
     createWish() {
       axios.post("/wish", { title: this.newWish }).then(() => {
         console.log("成功");
+        this.getWishes("wishesTodo", "todo");
       });
     },
-    queryWishes() {
-      axios.get("/wishes/todo").then(({ data }) => {
-        this.wishesTodo = data;
+    getWishes(container, status) {
+      axios.get(`/wishes?status=${status}`).then(({ data }) => {
+        this[container] = data;
       });
+    },
+    updateWishStatus(id, status) {
+      return axios
+        .put(`/wishes/${id}`, { status })
+        .then(() => {})
+        .catch();
+    },
+    getWishDoing() {
+      axios.get("/wishes/doing").then(({ data }) => {
+        this.wishDoing = data;
+      });
+    },
+    handleChoose() {
+      let index = Math.round(Math.random() * (this.wishesTodo.length - 1));
+      const wish = this.wishesTodo[index];
+      this.updateWishStatus(wish._id, "doing").then(() => {
+        this.wishDoing = wish;
+      });
+    },
+    handleDone() {
+      this.updateWishStatus(this.wishDoing._id, "done")
+        .then(() => {
+          this.wishDoing = {};
+          this.getWishes("wishesDone", "done");
+        })
+        .catch();
+    },
+    handleFail() {
+      this.updateWishStatus(this.wishDoing._id, "fail")
+        .then(() => {
+          this.wishDoing = {};
+          this.getWishes("wishesFail", "fail");
+        })
+        .catch();
     }
   },
   mounted() {
-    this.queryWishes();
+    this.getWishes("wishesTodo", "todo");
+    this.getWishes("wishesDone", "done");
+    this.getWishes("wishesFail", "fail");
+    this.getWishDoing();
   }
 };
 </script>

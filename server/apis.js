@@ -17,7 +17,6 @@ const wishModel = mongoose.model("wish", wishSchema);
 
 const apis = function(app) {
   app.post("/wish", function(req, res, next) {
-    console.log('收到请求')
     const {
       body: { title }
     } = req;
@@ -35,10 +34,11 @@ const apis = function(app) {
       res.status(400).send("Bad Request");
     }
   });
-  app.get("/wishes/todo", async function(req, res, next) {
+  app.get("/wishes", async function(req, res, next) {
+    const { status } = req.query;
     try {
       const totalCount = await wishModel.countDocuments();
-      const wishes = await wishModel.find({ status: "todo" }, "title", {
+      const wishes = await wishModel.find({ status }, "title status", {
         sort: { date_created: -1 }
       });
       res.set("x-total-count", totalCount).send(wishes);
@@ -47,25 +47,23 @@ const apis = function(app) {
       res.status(500).send("出了点错误");
     }
   });
-  app.get("/wishes/done", async function(req, res, next) {
+  app.get("/wishes/doing", async function(req, res, next) {
     try {
-      const totalCount = await wishModel.countDocuments();
-      const wishes = await wishModel.find({ status: "done" }, "title", {
-        sort: { date_created: -1 }
-      });
-      res.set("x-total-count", totalCount).send(wishes);
+      const wish = await wishModel.findOne({ status: "doing" }, "title status");
+      res.status(200).send(wish);
     } catch (e) {
       console.log(e);
       res.status(500).send("出了点错误");
     }
   });
-  app.get("/wishes/fail", async function(req, res, next) {
+  app.put("/wishes/:id", async function(req, res, next) {
+    const {
+      body: { status },
+      params: { id }
+    } = req;
     try {
-      const totalCount = await wishModel.countDocuments();
-      const wishes = await wishModel.find({ status: "fail" }, "title", {
-        sort: { date_created: -1 }
-      });
-      res.set("x-total-count", totalCount).send(wishes);
+      const wish = await wishModel.update({ _id: id }, { status });
+      res.status(201).send(wish);
     } catch (e) {
       console.log(e);
       res.status(500).send("出了点错误");
