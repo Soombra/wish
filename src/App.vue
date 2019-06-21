@@ -7,49 +7,57 @@
     </div>
     <div>
       <label>创建的心愿</label>
-      <ul>
-        <li v-for="(item, key) in wishesTodo" :key="key">{{ item.title }}</li>
-      </ul>
+      <!--<ul>-->
+      <!--<li v-for="(item, key) in wishesTodo" :key="key">{{ item.title }}</li>-->
+      <!--</ul>-->
+      <draw-table
+        v-if="wishesTodo.length"
+        :shouldRotate="shouldRotate"
+        :items="wishesTodo"
+        @finish="handleChoose"
+      />
     </div>
     <div v-if="wishDoing.title">
       当前正在进行的心愿: {{ wishDoing.title }}
       <button @click="handleDone">完成</button>
       <button @click="handleFail">废弃</button>
     </div>
-    <div v-else>
-      <button @click="handleChoose">随机选一个</button>
-    </div>
-    <div>
-      <label>完成的心愿</label>
-      <ul>
-        <li v-for="(item, key) in wishesDone" :key="key">{{ item.title }}</li>
-      </ul>
-    </div>
-    <div>
-      <label>废弃的心愿</label>
-      <ul>
-        <li v-for="(item, key) in wishesFail" :key="key">{{ item.title }}</li>
-      </ul>
-    </div>
+    <!--<div>-->
+    <!--<label>完成的心愿</label>-->
+    <!--<ul>-->
+    <!--<li v-for="(item, key) in wishesDone" :key="key">{{ item.title }}</li>-->
+    <!--</ul>-->
+    <!--</div>-->
+    <!--<div>-->
+    <!--<label>废弃的心愿</label>-->
+    <!--<ul>-->
+    <!--<li v-for="(item, key) in wishesFail" :key="key">{{ item.title }}</li>-->
+    <!--</ul>-->
+    <!--</div>-->
   </div>
 </template>
 
 <script>
 import axios from "axios";
+import drawTable from "./components/draw-table";
 export default {
   name: "app",
-  components: {},
+  components: {
+    drawTable
+  },
   data() {
     return {
       newWish: "",
       wishDoing: {},
       wishesTodo: [],
       wishesDone: [],
-      wishesFail: []
+      wishesFail: [],
+      shouldRotate: false
     };
   },
   methods: {
     createWish() {
+      if (!this.newWish) return;
       axios.post("/wish", { title: this.newWish }).then(() => {
         console.log("成功");
         this.getWishes("wishesTodo", "todo");
@@ -71,11 +79,14 @@ export default {
         this.wishDoing = data;
       });
     },
-    handleChoose() {
-      let index = Math.round(Math.random() * (this.wishesTodo.length - 1));
-      const wish = this.wishesTodo[index];
+    handleChoose(wish) {
+      console.log(wish.title);
       this.updateWishStatus(wish._id, "doing").then(() => {
-        this.wishDoing = wish;
+        console.log("34343");
+        this.shouldRotate = true;
+        setTimeout(() => {
+          this.wishDoing = wish;
+        }, 8000);
       });
     },
     handleDone() {
