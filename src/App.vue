@@ -27,7 +27,7 @@
     <!--<li v-for="(item, key) in wishesFail" :key="key">{{ item.title }}</li>-->
     <!--</ul>-->
     <!--</div>-->
-    <el-dialog width="400px" title="填写心愿" :visible.sync="showDialog">
+    <el-dialog width="350px" title="填写心愿" :visible.sync="showDialog">
       <el-input v-model="newWish"></el-input>
       <div slot="footer" class="dialog-footer">
         <el-button @click="showDialog = false">取 消</el-button>
