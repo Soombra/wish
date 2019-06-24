@@ -62,7 +62,7 @@ const apis = function(app) {
       params: { id }
     } = req;
     try {
-      const wish = await wishModel.update({ _id: id }, { status });
+      const wish = await wishModel.updateOne({ _id: id }, { status });
       res.status(201).send(wish);
     } catch (e) {
       console.log(e);

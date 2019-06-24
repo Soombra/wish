@@ -83,7 +83,6 @@ export default {
     handleChoose(wish) {
       if (this.wishDoing.title) return;
       this.updateWishStatus(wish._id, "doing").then(() => {
-        console.log("34343");
         this.shouldRotate = true;
         setTimeout(() => {
           this.wishDoing = wish;
