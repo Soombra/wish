@@ -126,7 +126,8 @@ export default {
 .table-container {
   height: 400px;
   width: 400px;
-  max-width: 100%;
+  max-width: 100vw;
+  max-height: 100vw;
   border-radius: 400px;
   overflow: hidden;
   margin: 0 auto;

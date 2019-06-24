@@ -138,4 +138,7 @@ body {
 .doing {
   margin-top: 50px;
 }
+.el-message-box {
+  max-width: 80%;
+}
 </style>
