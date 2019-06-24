@@ -41,7 +41,7 @@ const apis = function(app) {
       const wishes = await wishModel.find({ status }, "title status", {
         sort: { date_created: -1 }
       });
-      res.set("x-total-count", totalCount).send(wishes);
+      res.set("x-total-count", totalCount).status(200).send(wishes);
     } catch (e) {
       console.log(e);
       res.status(500).send("出了点错误");

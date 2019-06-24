@@ -74,12 +74,14 @@ export default {
         ctx.beginPath();
         ctx.fillStyle = "#fff";
         let text = item.title;
-        let textWidthLimit = Math.tan(angleStep / 2) * textRadio * 2 - 8;
-        let characterLimit = Math.round(textWidthLimit / fontSize);
         let characterArr = [];
-        while (text.length > characterLimit) {
-          characterArr.push(text.slice(0, characterLimit));
-          text = text.slice(characterLimit);
+        if (this.items.length > 1) {
+          let textWidthLimit = Math.tan(angleStep / 2) * textRadio * 2 - 8;
+          let characterLimit = Math.round(textWidthLimit / fontSize);
+          while (text.length > characterLimit) {
+            characterArr.push(text.slice(0, characterLimit));
+            text = text.slice(characterLimit);
+          }
         }
         characterArr.push(text);
         ctx.font = `normal ${fontSize}px Arial`;
