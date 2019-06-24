@@ -1,26 +1,19 @@
 <template>
   <div id="app">
-    <div>
-      <label>创建心愿</label>
-      <input type="text" v-model="newWish" />
-      <button @click="createWish">提交</button>
+    <draw-table
+      v-if="wishesTodo.length"
+      :shouldRotate="shouldRotate"
+      :items="wishesTodo"
+      @finish="handleChoose"
+    />
+    <div class="options">
+      <el-button type="primary" @click="showDialog = true">添加心愿</el-button>
     </div>
-    <div>
-      <label>创建的心愿</label>
-      <!--<ul>-->
-      <!--<li v-for="(item, key) in wishesTodo" :key="key">{{ item.title }}</li>-->
-      <!--</ul>-->
-      <draw-table
-        v-if="wishesTodo.length"
-        :shouldRotate="shouldRotate"
-        :items="wishesTodo"
-        @finish="handleChoose"
-      />
-    </div>
-    <div v-if="wishDoing.title">
-      当前正在进行的心愿: {{ wishDoing.title }}
-      <button @click="handleDone">完成</button>
-      <button @click="handleFail">废弃</button>
+    <div v-if="wishDoing.title" class="doing">
+      <h3>进行中:</h3>
+      <p>{{ wishDoing.title }}</p>
+      <el-button type="primary" @click="handleDone">已完成</el-button>
+      <el-button @click="handleFail">废弃</el-button>
     </div>
     <!--<div>-->
     <!--<label>完成的心愿</label>-->
@@ -34,6 +27,13 @@
     <!--<li v-for="(item, key) in wishesFail" :key="key">{{ item.title }}</li>-->
     <!--</ul>-->
     <!--</div>-->
+    <el-dialog width="400px" title="填写心愿" :visible.sync="showDialog">
+      <el-input v-model="newWish"></el-input>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="showDialog = false">取 消</el-button>
+        <el-button type="primary" @click="createWish">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -52,14 +52,15 @@ export default {
       wishesTodo: [],
       wishesDone: [],
       wishesFail: [],
-      shouldRotate: false
+      shouldRotate: false,
+      showDialog: false
     };
   },
   methods: {
     createWish() {
       if (!this.newWish) return;
       axios.post("/wish", { title: this.newWish }).then(() => {
-        console.log("成功");
+        this.showDialog = false;
         this.getWishes("wishesTodo", "todo");
       });
     },
@@ -80,7 +81,7 @@ export default {
       });
     },
     handleChoose(wish) {
-      console.log(wish.title);
+      if (this.wishDoing.title) return;
       this.updateWishStatus(wish._id, "doing").then(() => {
         console.log("34343");
         this.shouldRotate = true;
@@ -90,20 +91,24 @@ export default {
       });
     },
     handleDone() {
-      this.updateWishStatus(this.wishDoing._id, "done")
-        .then(() => {
-          this.wishDoing = {};
-          this.getWishes("wishesDone", "done");
-        })
-        .catch();
+      this.$confirm("真的做完了嘛？").then(() => {
+        this.updateWishStatus(this.wishDoing._id, "done")
+          .then(() => {
+            this.wishDoing = {};
+            this.getWishes("wishesDone", "done");
+          })
+          .catch();
+      });
     },
     handleFail() {
-      this.updateWishStatus(this.wishDoing._id, "fail")
-        .then(() => {
-          this.wishDoing = {};
-          this.getWishes("wishesFail", "fail");
-        })
-        .catch();
+      this.$confirm("真的不想去做了？").then(() => {
+        this.updateWishStatus(this.wishDoing._id, "fail")
+          .then(() => {
+            this.wishDoing = {};
+            this.getWishes("wishesFail", "fail");
+          })
+          .catch();
+      });
     }
   },
   mounted() {
@@ -123,5 +128,11 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+.options {
+  margin-top: 10px;
+}
+.doing {
+  margin-top: 50px;
 }
 </style>

@@ -8,9 +8,9 @@
         width="400"
         height="400"
       ></canvas>
-      <div class="arrow"></div>
+      <div class="arrow">随缘</div>
     </div>
-    <button @click="handleChoose">选一个</button>
+    <el-button type="primary" @click="handleChoose">随缘时间</el-button>
   </div>
 </template>
 <script>
@@ -21,6 +21,24 @@ const textRadio = 120;
 export default {
   data() {
     return {
+      colors: [
+        "#33B5E5",
+        "#99cc33",
+        "#ffc20e",
+        "#aa66cc",
+        "#24998d",
+        "#ffbb33",
+        "#fedcbd",
+        "#ae6642",
+        "#0099cc",
+        "#ff8800",
+        "#ffe600",
+        "#f36c21",
+        "#669900",
+        "#d1c7b7",
+        "#cdd541",
+        "#f8aba6"
+      ],
       rotateObj: {}
     };
   },
@@ -38,7 +56,7 @@ export default {
     tableInit() {
       ctx.clearRect(-200, -200, 400, 400);
       angleStep = (Math.PI * 2) / this.items.length;
-      this.items.forEach(item => {
+      this.items.forEach((item, index) => {
         ctx.beginPath();
         ctx.arc(
           0,
@@ -50,7 +68,11 @@ export default {
         ctx.lineTo(0, 0);
         ctx.closePath();
         ctx.stroke();
+        ctx.fillStyle = this.colors[index % this.colors.length];
+        ctx.fill();
 
+        ctx.beginPath();
+        ctx.fillStyle = "#fff";
         let text = item.title;
         let textWidthLimit = Math.tan(angleStep / 2) * textRadio * 2 - 8;
         let characterLimit = Math.round(textWidthLimit / fontSize);
@@ -62,6 +84,7 @@ export default {
         characterArr.push(text);
         ctx.font = `normal ${fontSize}px Arial`;
         ctx.textAlign = "center";
+        ctx.closePath();
         characterArr.forEach((item, index) => {
           ctx.fillText(
             item,
@@ -77,7 +100,7 @@ export default {
       let index = Math.round(Math.random() * (this.items.length - 1));
       const wish = this.items[index];
       this.rotateObj = {
-        transform: `rotate(${((index * angleStep) / Math.PI) * 180 + 2880}deg)`
+        transform: `rotate(${((index * angleStep) / Math.PI) * 180 + 5400}deg)`
       };
       this.$emit("finish", wish);
     }
@@ -91,7 +114,8 @@ export default {
     const canvas = document.getElementById("table");
     ctx = canvas.getContext("2d");
     ctx.translate(200, 200);
-    ctx.strokeStyle = "#999";
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "#eee";
     this.tableInit();
   }
 };
@@ -100,22 +124,29 @@ export default {
 .table-container {
   height: 400px;
   width: 400px;
+  border-radius: 400px;
+  overflow: hidden;
   margin: 0 auto;
   position: relative;
   .arrow {
     width: 80px;
     height: 80px;
     border-radius: 50px;
-    background-color: #66ccff;
+    background-color: #ffff00;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #aaa;
+    font-size: 26px;
     &::before {
       content: "";
       position: absolute;
-      border: 20px solid transparent;
-      border-bottom: 40px solid #66ccff;
+      border: 18px solid transparent;
+      border-bottom: 36px solid #ffff00;
       left: 50%;
       bottom: 70px;
       transform: translateX(-50%);
